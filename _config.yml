@@ -12,8 +12,8 @@ baseurl: ""
 squadron:
   name: "Blue Horizon Squadron"
   short_name: "BHS"
-  designation: "VF-1"
-  founded: "2023"
+  designation: "VF-607"
+  founded: "2024"
   motto: "Fly High. Fight Hard. Fly Together."
   # ── Discord Configuration ──────────────────────────────────────────────────
   # REQUIRED: Replace the placeholder values below with your real Discord details.
@@ -25,9 +25,9 @@ squadron:
   #                     directly into a Discord channel. Create one via:
   #                     Server Settings → Integrations → Webhooks → New Webhook.
   #                     Leave blank ("") to show a success message without posting to Discord.
-  discord_invite: "https://discord.gg/your-invite-code"
-  discord_widget_id: "YOUR_DISCORD_SERVER_ID"
-  discord_webhook: ""   # Paste your webhook URL here to enable registration notifications
+  discord_invite: "https://discord.gg/GTjsyAMVyv"
+  discord_widget_id: "1298769240874029106"
+  discord_webhook: "***REDACTED***"   # Paste your webhook URL here to enable registration notifications
 
 # Author
 author:
