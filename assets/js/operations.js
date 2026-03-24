@@ -68,6 +68,19 @@
   const successClose  = document.getElementById('success-close');
   const roleSelector  = document.getElementById('role-selector');
   const regRoleInput  = document.getElementById('reg-role');
+  const regRoleKeyInput = (function () {
+    // Create hidden input to preserve a stable role key (name|aircraft)
+    let el = document.getElementById('reg-role-key');
+    if (!el) {
+      el = document.createElement('input');
+      el.type = 'hidden';
+      el.id = 'reg-role-key';
+      el.name = 'role_key';
+      const form = document.getElementById('reg-form');
+      if (form) form.appendChild(el);
+    }
+    return el;
+  })();
   const formError     = document.getElementById('form-error');
   const submitText    = document.getElementById('submit-text');
   const submitLoading = document.getElementById('submit-loading');
@@ -107,6 +120,7 @@
   function buildRoleSelector(roles) {
     roleSelector.innerHTML = '';
     regRoleInput.value = '';
+    if (regRoleKeyInput) regRoleKeyInput.value = '';
 
     const roleIcons = {
       'flight lead': '👑',
@@ -126,20 +140,23 @@
       'ground':      '🗺️',
     };
 
-    roles.forEach(function (role) {
+    roles.forEach(function (role, idx) {
       const key      = role.name.toLowerCase();
       const iconKey  = Object.keys(roleIcons).find(function (k) { return key.includes(k); });
       const icon     = iconKey ? roleIcons[iconKey] : '🪂';
       const isFull   = role.filled >= role.slots;
       const available = role.slots - role.filled;
 
+      // Stable unique key for this role entry (disambiguates duplicates like "SEAD")
+      const roleKey = String(role.name || '') + '|' + String(role.aircraft || '');
+
       const div = document.createElement('div');
       div.className = 'role-option' + (isFull ? ' disabled' : '');
 
-      const radioId = 'role-' + role.name.replace(/\s+/g, '-').toLowerCase();
+      const radioId = 'role-' + roleKey.replace(/[^a-z0-9]+/gi, '-').toLowerCase() + '-' + idx;
 
       div.innerHTML =
-        '<input type="radio" name="role_choice" id="' + radioId + '" value="' + escHtml(role.name) + '"' +
+        '<input type="radio" name="role_choice" id="' + radioId + '" value="' + escHtml(role.name) + '" data-role-key="' + escHtml(roleKey) + '"' +
         (isFull ? ' disabled' : '') + '>' +
         '<label for="' + radioId + '">' +
         '<span class="icon">' + icon + '</span>' +
@@ -157,14 +174,27 @@
         radio.addEventListener('change', function () {
           if (this.checked) {
             regRoleInput.value = this.value;
+            if (regRoleKeyInput) regRoleKeyInput.value = this.getAttribute('data-role-key') || '';
+
             // Auto-set aircraft if possible
             const acSelect = document.getElementById('reg-aircraft');
             if (acSelect && role.aircraft && role.aircraft !== 'Various' && role.aircraft !== 'Ground') {
-              // Try to match option
+              // Match exact option text first, then fallback to contains
+              const want = String(role.aircraft).trim().toLowerCase();
+              let matched = false;
               for (let i = 0; i < acSelect.options.length; i++) {
-                if (acSelect.options[i].text.toLowerCase().includes(role.aircraft.toLowerCase().split(' ')[0])) {
+                if (String(acSelect.options[i].text || '').trim().toLowerCase() === want) {
                   acSelect.selectedIndex = i;
+                  matched = true;
                   break;
+                }
+              }
+              if (!matched) {
+                for (let i = 0; i < acSelect.options.length; i++) {
+                  if (String(acSelect.options[i].text || '').trim().toLowerCase().includes(want)) {
+                    acSelect.selectedIndex = i;
+                    break;
+                  }
                 }
               }
             }
@@ -216,6 +246,7 @@
     const discord  = document.getElementById('reg-discord').value.trim();
     const callsign = document.getElementById('reg-callsign').value.trim();
     const role     = regRoleInput.value;
+    const roleKey  = regRoleKeyInput ? regRoleKeyInput.value : '';
     const aircraft = document.getElementById('reg-aircraft').value;
 
     if (!discord) {
@@ -233,11 +264,19 @@
       return false;
     }
 
+    if (!roleKey) {
+      showError('Please select a role from the list above.');
+      return false;
+    }
+
     // Hard-stop if the chosen role is full (client-side enforcement)
     // Note: true enforcement must also exist server-side; for a static site this
     // prevents obvious overbooking and blocks stale UI selections.
     if (Array.isArray(currentRoles) && currentRoles.length) {
-      const selected = currentRoles.find(function (r) { return r && r.name === role; });
+      const selected = currentRoles.find(function (r) {
+        if (!r) return false;
+        return (String(r.name || '') + '|' + String(r.aircraft || '')) === roleKey;
+      });
       if (selected && typeof selected.slots !== 'undefined' && typeof selected.filled !== 'undefined') {
         if (Number(selected.filled) >= Number(selected.slots)) {
           showError('That role is currently full. Please select another role.');
@@ -290,23 +329,22 @@
 
       setSubmitLoading(true);
 
+      const roleKey = regRoleKeyInput ? regRoleKeyInput.value : '';
+      const selectedRole = (Array.isArray(currentRoles) && currentRoles.length)
+        ? currentRoles.find(function (r) {
+            if (!r) return false;
+            return (String(r.name || '') + '|' + String(r.aircraft || '')) === roleKey;
+          })
+        : null;
+
       const data = {
         operation_id:   document.getElementById('reg-op-id').value,
         operation_name: document.getElementById('reg-op-name').value,
         discord:        document.getElementById('reg-discord').value.trim(),
         callsign:       document.getElementById('reg-callsign').value.trim(),
         role:           regRoleInput.value,
-        role_aircraft:  (function () {
-          if (!Array.isArray(currentRoles) || !currentRoles.length) return '';
-          const selected = currentRoles.find(function (r) { return r && r.name === regRoleInput.value; });
-          if (!selected) return '';
-          return String(selected.name || '') + '|' + String(selected.aircraft || '');
-        })(),
-        role_slots:     (function () {
-          if (!Array.isArray(currentRoles) || !currentRoles.length) return '';
-          const selected = currentRoles.find(function (r) { return r && r.name === regRoleInput.value; });
-          return selected && typeof selected.slots !== 'undefined' ? selected.slots : '';
-        })(),
+        role_aircraft:  roleKey,
+        role_slots:     selectedRole && typeof selectedRole.slots !== 'undefined' ? selectedRole.slots : '',
         aircraft:       document.getElementById('reg-aircraft').value,
         experience:     document.getElementById('reg-exp').value,
         notes:          document.getElementById('reg-notes').value.trim(),
