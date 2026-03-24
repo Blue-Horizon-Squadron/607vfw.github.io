@@ -46,10 +46,24 @@ export default {
 
     // Basic CORS
     const origin = request.headers.get('Origin');
-    const allowOrigin = isAllowedOrigin(origin, env) ? origin : '*';
+    const originAllowed = isAllowedOrigin(origin, env);
+    const allowOrigin = originAllowed ? origin : '*';
+
+    // If an allowlist is configured, block disallowed cross-origin requests.
+    // (Still allows requests with no Origin header, e.g. server-to-server/tests.)
+    const hasOrigin = Boolean(origin);
+    const hasAllowlist = Boolean((env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean).length);
+    if (hasOrigin && hasAllowlist && !originAllowed) {
+      return jsonResponse({ ok: false, message: 'Origin not allowed.' }, 403, allowOrigin);
+    }
 
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders(allowOrigin) });
+    }
+
+    // Lightweight health check
+    if (url.pathname === '/health' && request.method === 'GET') {
+      return jsonResponse({ ok: true }, 200, allowOrigin);
     }
 
     // Admin: reset operation state (protected)
@@ -187,7 +201,15 @@ export default {
         // Side effects
         const payloadForNotify = { ...body, ...storeJson.result };
 
-        if (env.DISCORD_WEBHOOK_URL) {
+        // Discord: only notify on create by default. Optionally notify on updates that change role.
+        const notifyOnUpdate = String(env.DISCORD_NOTIFY_ON_UPDATE || '').toLowerCase() === 'true';
+        const notifyOnRoleChange = String(env.DISCORD_NOTIFY_ON_ROLE_CHANGE || '').toLowerCase() === 'true';
+        const created = Boolean(storeJson.result?.created);
+        const updated = Boolean(storeJson.result?.updated);
+        const roleChanged = Boolean(storeJson.result?.role_changed);
+        const shouldNotify = created || (updated && (notifyOnUpdate || (notifyOnRoleChange && roleChanged)));
+
+        if (env.DISCORD_WEBHOOK_URL && shouldNotify) {
           ctx.waitUntil(postDiscord(env.DISCORD_WEBHOOK_URL, payloadForNotify));
         }
 

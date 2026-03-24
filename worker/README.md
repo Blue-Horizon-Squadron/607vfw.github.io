@@ -90,13 +90,27 @@ If you *must* temporarily allow client-provided capacities, set:
    - `DISCORD_WEBHOOK_URL` (string) – optional
    - `GSHEET_ID` (string) – optional
    - `GOOGLE_SERVICE_ACCOUNT_JSON` (secret) – optional
+   - `ALLOWED_ORIGINS` (string, comma-separated) – recommended
+     - If set, cross-origin requests are rejected with 403 unless the request `Origin` is in the list.
 
-4. Deploy.
+### Discord notification behavior
+
+By default the Worker notifies Discord **only for new registrations** (not updates).
+
+You can change this with Worker variables:
+
+- `DISCORD_NOTIFY_ON_UPDATE=true` — notify on any update
+- `DISCORD_NOTIFY_ON_ROLE_CHANGE=true` — notify only when an update changes role/aircraft
+
+If both are unset/false, only creates notify.
+
+1. Deploy.
 
 Then set these in the website repo (`_config.yml`):
 
 - `registration.endpoint`: your Worker URL, e.g. `https://bhs-registration.<name>.workers.dev/register`
-- `registration.shared_secret`: the same value as `BHS_SHARED_SECRET`
+
+> The site no longer needs `registration.shared_secret` committed in git. Keep `BHS_SHARED_SECRET` only in Cloudflare.
 
 ## Google Sheets (service account)
 
@@ -157,6 +171,8 @@ Plain variables (Dashboard → Worker → Settings → Variables):
 - `GSHEET_ID` (required for Sheets)
 - `GSHEET_TAB` (required for Sheets)
 - `ALLOWED_ORIGINS` (recommended)
+- `DISCORD_NOTIFY_ON_UPDATE` (optional)
+- `DISCORD_NOTIFY_ON_ROLE_CHANGE` (optional)
 
 ### Helpful admin endpoints (protected by X-BHS-Auth)
 
@@ -166,3 +182,8 @@ Plain variables (Dashboard → Worker → Settings → Variables):
 Quick runtime verification (requires `BHS_SHARED_SECRET`):
 
 - `GET /admin/config-status`
+
+```text
+# Example
+curl -H "X-BHS-Auth: <BHS_SHARED_SECRET>" https://<worker>/admin/config-status
+```

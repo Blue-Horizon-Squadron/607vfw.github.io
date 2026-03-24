@@ -62,6 +62,11 @@ export class RegistrationStore {
     const roles = (await this.state.storage.get('roles')) || {};
     const regs = (await this.state.storage.get('regs')) || {};
 
+    const previous = regs[discord];
+    const previousRoleKey = previous?.role_key;
+    const isUpdate = Boolean(previous);
+    const roleChanged = Boolean(previous) && previousRoleKey !== roleKey;
+
     // Trusted role capacity (tamper-proof)
     // Prefer a more specific role key when available to disambiguate duplicate role names.
     let roleSlots = await getRoleSlotsFromConfig(this.env, body.operation_id, roleKey);
@@ -85,7 +90,6 @@ export class RegistrationStore {
     }
 
     // Upsert logic: if existing registration exists, free previous role slot
-    const previous = regs[discord];
     if (previous && previous.role_key && roles[previous.role_key]) {
       if (roles[previous.role_key].filled > 0) roles[previous.role_key].filled -= 1;
     }
@@ -122,6 +126,21 @@ export class RegistrationStore {
     await this.state.storage.put('roles', roles);
     await this.state.storage.put('regs', regs);
 
-    return jsonResponse({ ok: true, result: { role_filled: roles[roleKey].filled, role_slots: roles[roleKey].slots } }, 200, '*');
+    return jsonResponse(
+      {
+        ok: true,
+        result: {
+          created: !isUpdate,
+          updated: isUpdate,
+          role_changed: roleChanged,
+          previous_role_key: previousRoleKey || null,
+          role_key: roleKey,
+          role_filled: roles[roleKey].filled,
+          role_slots: roles[roleKey].slots,
+        }
+      },
+      200,
+      '*'
+    );
   }
 }
