@@ -3,14 +3,14 @@ main = "src/index.js"
 compatibility_date = "2026-03-24"
 account_id = "dd7460ed0568d95337504a93acc78517"
 
+# KV namespace binding (must match code: env.OPS_CONFIG)
+kv_namespaces = [
+  { binding = "OPS_CONFIG", id = "93174b42ba64497e9e7cea6968fd37a7" }
+]
+
 [durable_objects]
 bindings = [
   { name = "REG_STORE", class_name = "RegistrationStore" }
-]
-
-# Wrangler v4 KV namespace binding (variable name MUST match code: env.OPS_CONFIG)
-kv_namespaces = [
-  { binding = "OPS_CONFIG", id = "93174b42ba64497e9e7cea6968fd37a7" }
 ]
 
 [[migrations]]

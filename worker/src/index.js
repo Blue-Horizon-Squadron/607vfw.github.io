@@ -10,7 +10,7 @@
  */
 
 import { RegistrationStore } from './store.js';
-import { jsonResponse, readJson, requireAuth, corsHeaders, isAllowedOrigin } from './util.js';
+import { jsonResponse, readJson, requireAuth, corsHeaders, isAllowedOrigin, issueAdminCookie } from './util.js';
 import { postDiscord } from './discord.js';
 import { upsertRegistrationRow } from './googleSheets.js';
 
@@ -59,6 +59,48 @@ export default {
 
     if (request.method === 'OPTIONS') {
       return new Response(null, { status: 204, headers: corsHeaders(allowOrigin) });
+    }
+
+    // Admin: login (sets HttpOnly cookie). Protected by providing the shared secret once.
+    // POST /admin/login { secret: "..." }
+    if (url.pathname === '/admin/login' && request.method === 'POST') {
+      try {
+        const body = await readJson(request);
+        const want = env.BHS_SHARED_SECRET;
+        if (!want) {
+          return jsonResponse({ ok: false, message: 'Admin auth not configured.' }, 400, allowOrigin);
+        }
+        const got = String(body.secret || '');
+        if (!got || got !== want) {
+          return jsonResponse({ ok: false, message: 'Unauthorized' }, 401, allowOrigin);
+        }
+
+        const cookie = await issueAdminCookie(env);
+        return new Response(JSON.stringify({ ok: true }), {
+          status: 200,
+          headers: {
+            ...corsHeaders(allowOrigin),
+            'Set-Cookie': cookie,
+          },
+        });
+      } catch (e) {
+        return jsonResponse({ ok: false, message: e?.message || 'Unauthorized' }, 401, allowOrigin);
+      }
+    }
+
+    // Admin: logout (clears cookie)
+    // POST /admin/logout
+    if (url.pathname === '/admin/logout' && request.method === 'POST') {
+      const isProd = String(env.COOKIE_SECURE || '').toLowerCase() === 'true';
+      const secure = isProd ? ' Secure;' : '';
+      const clear = `bhs_admin=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0;${secure}`;
+      return new Response(JSON.stringify({ ok: true }), {
+        status: 200,
+        headers: {
+          ...corsHeaders(allowOrigin),
+          'Set-Cookie': clear,
+        },
+      });
     }
 
     // Lightweight health check

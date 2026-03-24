@@ -1,0 +1,71 @@
+---
+layout: default
+title: Admin
+description: "BHS admin tools for operations registration (protected by shared secret)."
+extra_js:
+  - /assets/js/admin.js
+---
+
+<div class="page-header">
+  <div class="container">
+    <h1>Admin</h1>
+    <p class="page-header__subtitle">Operations registration admin tools</p>
+  </div>
+</div>
+
+<div class="container" style="padding-bottom: 80px; max-width: 980px;">
+  <div style="background:#161b22; border:1px solid #30363d; border-radius:12px; padding:24px; margin-top:24px;">
+    <h2 style="margin-top:0;">Access</h2>
+    <p style="color:#8b949e; margin-top:8px;">
+      Login sets a short-lived admin session cookie (HttpOnly). You only need to paste the secret once per device.
+    </p>
+
+    <div class="form-group" style="max-width:560px;">
+      <label for="admin-secret">Admin Secret</label>
+      <input id="admin-secret" class="form-control" type="password" placeholder="Paste admin secret once" autocomplete="off" />
+      <p class="form-hint">Stored in your browser (localStorage) and used only to obtain a session cookie. Clear it when done.</p>
+    </div>
+
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+      <button class="btn btn--secondary" id="btn-save-secret">Login</button>
+      <button class="btn btn--secondary" id="btn-clear-secret">Logout</button>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns: 1fr; gap:16px; margin-top:24px;">
+    <div style="background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:24px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+        <h2 style="margin:0;">Config status</h2>
+        <button class="btn btn--primary" id="btn-refresh-status">Refresh</button>
+      </div>
+      <p style="color:#8b949e; margin-top:8px;">Checks whether OPS config is present in KV and shows basic env checks.</p>
+      <pre id="config-status" style="margin-top:12px; background:#161b22; border:1px solid #30363d; border-radius:8px; padding:12px; overflow:auto; min-height:72px;"></pre>
+    </div>
+
+    <div style="background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:24px;">
+      <h2 style="margin-top:0;">Reset operation Durable Object state</h2>
+      <p style="color:#8b949e; margin-top:8px;">
+        Use this after you clear Google Sheet contents (leaving headers). It resets the Worker’s registration state so the next signup is treated as a new registration.
+      </p>
+
+      <div class="form-group" style="max-width:420px;">
+        <label for="reset-operation-id">Operation ID</label>
+        <input id="reset-operation-id" class="form-control" type="text" placeholder="e.g. op-002" autocomplete="off" />
+        <p class="form-hint">This is the <code>id</code> from <code>_data/operations.yml</code>.</p>
+      </div>
+
+      <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center;">
+        <button class="btn btn--danger" id="btn-reset">Reset operation</button>
+        <span id="reset-result" style="font-size:.875rem; color:#8b949e;"></span>
+      </div>
+    </div>
+
+    <div style="background:#0d1117; border:1px solid #30363d; border-radius:12px; padding:24px;">
+      <h2 style="margin-top:0;">Notes</h2>
+      <ul style="margin:0; padding-left:18px; color:#8b949e;">
+        <li>This page is static; protection is enforced by the Worker (X-BHS-Auth).</li>
+        <li>Only use this on a trusted computer and sign out (clear secret) when done.</li>
+      </ul>
+    </div>
+  </div>
+</div>
