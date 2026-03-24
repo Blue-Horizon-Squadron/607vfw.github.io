@@ -39,6 +39,16 @@ export class RegistrationStore {
       return res;
     }
 
+    // Public: return current role fill/slot counts for UI.
+    // Called via Worker route /ops-status.
+    if (url.pathname === '/status' && request.method === 'GET') {
+      const operationId = url.searchParams.get('operation_id');
+      const res = await this.state.blockConcurrencyWhile(async () => {
+        return await this._status(operationId);
+      });
+      return res;
+    }
+
     if (url.pathname === '/debug' && request.method === 'GET') {
       const snapshot = await this._snapshot();
       return jsonResponse({ ok: true, snapshot }, 200, '*');
@@ -51,6 +61,38 @@ export class RegistrationStore {
     const roles = (await this.state.storage.get('roles')) || {};
     const regs = (await this.state.storage.get('regs')) || {};
     return { roles, regsCount: Object.keys(regs).length };
+  }
+
+  async _status(operationIdFromQuery) {
+    const operationId = String(operationIdFromQuery || '').trim();
+
+    const roles = (await this.state.storage.get('roles')) || {};
+
+    // If configured, lazily initialize role slots from trusted config so UI has full list
+    // even before any registrations happen.
+    if (operationId) {
+      const keysToEnsure = Object.keys(roles);
+      // If we have no roles stored yet, try to load from trusted config using known role keys.
+      // We can't enumerate KV here, so the UI will still send its known role keys in practice.
+      // This endpoint returns whatever we currently know; unknown roles will be filled in client-side.
+      for (const rk of keysToEnsure) {
+        if (!roles[rk] || !Number.isFinite(roles[rk].slots) || roles[rk].slots <= 0) {
+          const roleSlots = await getRoleSlotsFromConfig(this.env, operationId, rk);
+          if (Number.isFinite(roleSlots) && roleSlots > 0) {
+            roles[rk] = { slots: roleSlots, filled: Number(roles[rk]?.filled || 0) };
+          }
+        }
+      }
+    }
+
+    await this.state.storage.put('roles', roles);
+
+    const roleStatus = {};
+    for (const [k, v] of Object.entries(roles)) {
+      roleStatus[k] = { slots: Number(v.slots || 0), filled: Number(v.filled || 0) };
+    }
+
+    return jsonResponse({ ok: true, operation_id: operationId || null, roles: roleStatus }, 200, '*');
   }
 
   async _register(body) {

@@ -66,6 +66,30 @@ export default {
       return jsonResponse({ ok: true }, 200, allowOrigin);
     }
 
+    // Public: live role status for an operation
+    // GET /ops-status?operation_id=op-002
+    if (url.pathname === '/ops-status' && request.method === 'GET') {
+      try {
+        const operationId = url.searchParams.get('operation_id');
+        if (!operationId || operationId.trim() === '') {
+          return jsonResponse({ ok: false, message: 'Missing operation_id.' }, 400, allowOrigin);
+        }
+
+        const id = env.REG_STORE.idFromName(String(operationId));
+        const stub = env.REG_STORE.get(id);
+
+        const res = await stub.fetch(`https://do/status?operation_id=${encodeURIComponent(String(operationId))}`, {
+          method: 'GET',
+          env: { OPS_CONFIG: env.OPS_CONFIG },
+        });
+
+        const j = await res.json().catch(() => ({ ok: false, message: 'Status error.' }));
+        return jsonResponse(j, res.status || 200, allowOrigin);
+      } catch (e) {
+        return jsonResponse({ ok: false, message: e?.message || 'Server error.' }, 500, allowOrigin);
+      }
+    }
+
     // Admin: reset operation state (protected)
     // POST /admin/reset  { operation_id: "op-001" }
     // POST /admin/reset  { all: true }    (dangerous)

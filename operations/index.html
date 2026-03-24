@@ -79,11 +79,15 @@ extra_js:
             <div style="font-size:.8rem; color:#8b949e; text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px;">Available Roles</div>
             <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap:8px;">
               {% for role in op.roles %}
-              {% assign role_pct = role.filled | times: 100 | divided_by: role.slots %}
-              <div style="background:#0d1117; border:1px solid {% if role.filled >= role.slots %}rgba(215,58,73,.4){% else %}#30363d{% endif %}; border-radius:6px; padding:10px 12px;">
-                <div style="font-size:.85rem; font-weight:600; color:{% if role.filled >= role.slots %}#d73a49{% else %}#f0f6fc{% endif %}; margin-bottom:2px;">{{ role.name }}</div>
+              {% assign role_key = role.name | append: '|' | append: role.aircraft %}
+              <div
+                data-role-key="{{ role_key | escape }}"
+                data-role-slots="{{ role.slots }}"
+                data-role-filled="{{ role.filled }}"
+                style="background:#0d1117; border:1px solid #30363d; border-radius:6px; padding:10px 12px;">
+                <div style="font-size:.85rem; font-weight:600; color:#f0f6fc; margin-bottom:2px;">{{ role.name }}</div>
                 <div style="font-size:.78rem; color:#8b949e; margin-bottom:4px;">{{ role.aircraft }}</div>
-                <div style="font-size:.75rem; color:{% if role.filled >= role.slots %}#d73a49{% else %}#2d9cdb{% endif %};">
+                <div data-role-status style="font-size:.75rem; color:#2d9cdb;">
                   {% if role.filled >= role.slots %}
                   🔴 FULL ({{ role.filled }}/{{ role.slots }})
                   {% else %}
@@ -97,12 +101,11 @@ extra_js:
           </div>
 
           <!-- Slots bar -->
-          <div class="op-card__slots" style="margin-top:16px;">
+          <div class="op-card__slots" style="margin-top:16px;" data-op-id="{{ op.id }}" data-op-slots-total="{{ op.slots_total }}" data-op-slots-filled="{{ op.slots_filled }}">
             {% assign pct = op.slots_filled | times: 100 | divided_by: op.slots_total %}
             <div class="op-card__slots-label">Overall registration ({{ op.slots_filled }}/{{ op.slots_total }} pilots)</div>
             <div class="op-card__slots-bar">
-              <div class="op-card__slots-fill{% if pct >= 100 %} full{% elsif pct >= 80 %} almost{% endif %}"
-                   style="width:{{ pct }}%"></div>
+              <div class="op-card__slots-fill" data-op-slots-pct="{{ pct }}" style="width:0%"></div>
             </div>
             {% assign slots_remaining = op.slots_total | minus: op.slots_filled %}
             <div class="op-card__slots-text">{{ slots_remaining }} slot{% if slots_remaining != 1 %}s{% endif %} remaining</div>

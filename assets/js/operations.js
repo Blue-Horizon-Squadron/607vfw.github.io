@@ -26,16 +26,140 @@
   const DISCORD_WEBHOOK_FROM_CFG = cfgEl ? (cfgEl.getAttribute('data-discord-webhook') || '') : '';
   const EFFECTIVE_DISCORD_WEBHOOK = DISCORD_WEBHOOK_FROM_CFG || DISCORD_WEBHOOK || '';
 
+  // Derive ops-status endpoint from registration endpoint
+  const OPS_STATUS_ENDPOINT = (function () {
+    if (!REG_ENDPOINT) return '';
+    try {
+      const u = new URL(REG_ENDPOINT);
+      u.pathname = '/ops-status';
+      u.search = '';
+      return u.toString();
+    } catch {
+      return '';
+    }
+  })();
+
+  function roleKeyOf(role) {
+    return String(role?.name || '') + '|' + String(role?.aircraft || '');
+  }
+
+  function mergeLiveRoleStatus(roles, liveRoles) {
+    if (!Array.isArray(roles) || !liveRoles) return roles;
+    return roles.map(function (r) {
+      const rk = roleKeyOf(r);
+      const live = liveRoles[rk];
+      if (!live) return r;
+      return {
+        ...r,
+        slots: typeof live.slots === 'number' ? live.slots : r.slots,
+        filled: typeof live.filled === 'number' ? live.filled : r.filled,
+      };
+    });
+  }
+
+  async function fetchOpStatus(operationId) {
+    if (!OPS_STATUS_ENDPOINT || !operationId) return null;
+    const url = OPS_STATUS_ENDPOINT + '?operation_id=' + encodeURIComponent(operationId);
+    const res = await fetch(url, { method: 'GET' });
+    const json = await res.json().catch(function () { return null; });
+    if (!res.ok) return null;
+    return json;
+  }
+
+  function updateOpCardUI(opId, liveRoles) {
+    const card = document.getElementById(opId);
+    if (!card || !liveRoles) return;
+
+    // Update role tiles
+    const roleTiles = card.querySelectorAll('[data-role-key]');
+    if (roleTiles && roleTiles.length) {
+      roleTiles.forEach(function (tile) {
+        const rk = tile.getAttribute('data-role-key');
+        const live = liveRoles[rk];
+        if (!live) return;
+
+        const statusEl = tile.querySelector('[data-role-status]');
+        if (!statusEl) return;
+
+        const open = Number(live.slots || 0) - Number(live.filled || 0);
+        const isFull = open <= 0;
+
+        // Update style hints (keeps original look but reflects fullness)
+        tile.style.borderColor = isFull ? 'rgba(215,58,73,.4)' : '#30363d';
+        const titleEl = tile.querySelector('div');
+        if (titleEl) titleEl.style.color = isFull ? '#d73a49' : '#f0f6fc';
+        statusEl.style.color = isFull ? '#d73a49' : '#2d9cdb';
+
+        if (isFull) {
+          statusEl.textContent = `🔴 FULL (${live.filled}/${live.slots})`;
+          statusEl.setAttribute('data-role-full', 'true');
+        } else {
+          statusEl.textContent = `🟢 ${open} slot${open !== 1 ? 's' : ''} open`;
+          statusEl.setAttribute('data-role-full', 'false');
+        }
+      });
+    }
+
+    // Apply slots bar width (from server-rendered pct)
+    const slotsFill = card.querySelector('.op-card__slots-fill[data-op-slots-pct]');
+    if (slotsFill) {
+      const pct = Number(slotsFill.getAttribute('data-op-slots-pct') || '0');
+      if (Number.isFinite(pct)) slotsFill.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+    }
+  }
+
+  async function refreshOperationStatus(opId) {
+    const status = await fetchOpStatus(opId);
+    if (!status || !status.ok) return null;
+    return status.roles || null;
+  }
+
   // ─── Wire up register buttons via data attributes ────────────────────────────
 
   document.querySelectorAll('.js-register-btn').forEach(function (btn) {
-    btn.addEventListener('click', function () {
+    btn.addEventListener('click', async function () {
       const opId      = btn.getAttribute('data-op-id');
       const opCode    = btn.getAttribute('data-op-codename');
       const opTitle   = btn.getAttribute('data-op-title');
       let   roles     = [];
       try { roles = JSON.parse(btn.getAttribute('data-op-roles')); } catch (e) {}
+
+      // Pull live counts before opening modal
+      try {
+        const liveRoles = await refreshOperationStatus(opId);
+        if (liveRoles) {
+          roles = mergeLiveRoleStatus(roles, liveRoles);
+          // Update card UI too
+          updateOpCardUI(opId, liveRoles);
+        }
+      } catch (e) {
+        // best-effort; ignore
+      }
+
       openRegistration(opId, opCode, opTitle, roles);
+    });
+  });
+
+  // On initial page load, best-effort refresh for all operation cards
+  window.addEventListener('load', function () {
+    const buttons = document.querySelectorAll('.js-register-btn');
+    buttons.forEach(function (btn) {
+      const opId = btn.getAttribute('data-op-id');
+      if (!opId) return;
+
+      // Ensure static slots bar is rendered even before live refresh
+      try {
+        const card = document.getElementById(opId);
+        const slotsFill = card ? card.querySelector('.op-card__slots-fill[data-op-slots-pct]') : null;
+        if (slotsFill) {
+          const pct = Number(slotsFill.getAttribute('data-op-slots-pct') || '0');
+          if (Number.isFinite(pct)) slotsFill.style.width = `${Math.max(0, Math.min(100, pct))}%`;
+        }
+      } catch (e) {}
+
+      refreshOperationStatus(opId).then(function (liveRoles) {
+        if (liveRoles) updateOpCardUI(opId, liveRoles);
+      }).catch(function () { /* ignore */ });
     });
   });
 
