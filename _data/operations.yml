@@ -1,9 +1,9 @@
 - id: op-001
   codename: "Exercise Black Flag"
   title: "Black Flag"
-  theater: "Caucasus"
+  theater: "Modern"
   map: "Caucasus"
-  status: "continuous"
+  status: "active"
   date: "Every Day"
   time: "Any Time"
   duration: "no limit"
@@ -25,26 +25,27 @@
   roles:
     - name: "SEAD"
       aircraft: "F-16C Viper"
-      slots: 5
+      slots: 10
       filled: 0
     - name: "SEAD"
       aircraft: "F/A-18C Hornet"
-      slots: 5
+      slots: 10
+      filled: 0
     - name: "STRIKE"
       aircraft: "F-15E"
-      slots: 5
+      slots: 10
       filled: 0
     - name: "STRIKE"
       aircraft: "F-4E Phantom"
-      slots: 5
+      slots: 10
       filled: 0  
     - name: "Intercept"
       aircraft: "F-14B Tomcat"
-      slots: 5
+      slots: 10
       filled: 0
     - name: "Escort"
       aircraft: "F-15C"
-      slots: 5
+      slots: 10
       filled: 0
   patch_image: "/assets/images/bhs-black-flag.png"
   tags:
@@ -57,11 +58,11 @@
 - id: op-002
   codename: "OPERATION MASKED HYDRA"
   title: "Masked Hydra - Canyon Runs"
-  theater: "Caucasus"
+  theater: "Modern"
   map: "Caucasus"
   status: "upcoming"
   date: "2026-04-18"
-  time: "19:00 ZULU"
+  time: "18:00 ZULU"
   duration: "2–3 hours"
   difficulty: "Intermediate"
   slots_total: 20
