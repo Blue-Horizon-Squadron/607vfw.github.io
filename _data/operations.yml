@@ -36,7 +36,7 @@
       aircraft: "F-14B Tomcat"
       slots: 4
       filled: 0
-  patch_image: "/assets/images/masked-hydra.png"
+  patch_image: "/bhs.github.io/assets/images/masked-hydra.png"
   tags:
     - "Caucasus"
     - "Multi-Role"
