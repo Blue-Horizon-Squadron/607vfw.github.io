@@ -19,6 +19,13 @@
     ? window.BHS_DISCORD_WEBHOOK
     : '';
 
+  // Registration backend (Cloudflare Worker recommended)
+  const cfgEl = document.getElementById('bhs-config');
+  const REG_ENDPOINT = cfgEl ? (cfgEl.getAttribute('data-registration-endpoint') || '') : '';
+  const REG_SHARED_SECRET = cfgEl ? (cfgEl.getAttribute('data-registration-shared-secret') || '') : '';
+  const DISCORD_WEBHOOK_FROM_CFG = cfgEl ? (cfgEl.getAttribute('data-discord-webhook') || '') : '';
+  const EFFECTIVE_DISCORD_WEBHOOK = DISCORD_WEBHOOK_FROM_CFG || DISCORD_WEBHOOK || '';
+
   // ─── Wire up register buttons via data attributes ────────────────────────────
 
   document.querySelectorAll('.js-register-btn').forEach(function (btn) {
@@ -225,6 +232,22 @@
       showError('Please select a role from the list above.');
       return false;
     }
+
+    // Hard-stop if the chosen role is full (client-side enforcement)
+    // Note: true enforcement must also exist server-side; for a static site this
+    // prevents obvious overbooking and blocks stale UI selections.
+    if (Array.isArray(currentRoles) && currentRoles.length) {
+      const selected = currentRoles.find(function (r) { return r && r.name === role; });
+      if (selected && typeof selected.slots !== 'undefined' && typeof selected.filled !== 'undefined') {
+        if (Number(selected.filled) >= Number(selected.slots)) {
+          showError('That role is currently full. Please select another role.');
+          // Optionally focus the role grid
+          if (roleSelector) roleSelector.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          return false;
+        }
+      }
+    }
+
     if (!aircraft) {
       showError('Please select your aircraft module.');
       document.getElementById('reg-aircraft').focus();
@@ -273,6 +296,11 @@
         discord:        document.getElementById('reg-discord').value.trim(),
         callsign:       document.getElementById('reg-callsign').value.trim(),
         role:           regRoleInput.value,
+        role_slots:     (function () {
+          if (!Array.isArray(currentRoles) || !currentRoles.length) return '';
+          const selected = currentRoles.find(function (r) { return r && r.name === regRoleInput.value; });
+          return selected && typeof selected.slots !== 'undefined' ? selected.slots : '';
+        })(),
         aircraft:       document.getElementById('reg-aircraft').value,
         experience:     document.getElementById('reg-exp').value,
         notes:          document.getElementById('reg-notes').value.trim(),
@@ -280,7 +308,14 @@
         timestamp:      new Date().toISOString(),
       };
 
-      if (DISCORD_WEBHOOK) {
+      // Preferred: send to backend endpoint (does slot enforcement + then notifies)
+      if (REG_ENDPOINT) {
+        sendToBackend(data);
+        return;
+      }
+
+      // Fallback: direct Discord webhook
+      if (EFFECTIVE_DISCORD_WEBHOOK) {
         sendToDiscord(data);
       } else {
         // No webhook configured — show success after short delay (for demo)
@@ -290,6 +325,46 @@
           showSuccess();
         }, 800);
       }
+    });
+  }
+
+  // ─── Backend submission (Cloudflare Worker) ─────────────────────────────────-
+
+  function sendToBackend(data) {
+    const headers = { 'Content-Type': 'application/json' };
+    if (REG_SHARED_SECRET) headers['X-BHS-Auth'] = REG_SHARED_SECRET;
+
+    fetch(REG_ENDPOINT, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(data)
+    })
+    .then(function (res) {
+      return res.json().catch(function () {
+        return { ok: false, status: res.status, message: 'Invalid server response.' };
+      }).then(function (json) {
+        json._httpStatus = res.status;
+        return json;
+      });
+    })
+    .then(function (json) {
+      setSubmitLoading(false);
+      if (json && json.ok) {
+        closeRegModal();
+        showSuccess();
+        return;
+      }
+
+      // Slot full / validation errors should show message
+      const msg = (json && (json.message || json.error))
+        ? (json.message || json.error)
+        : ('Submission failed.');
+      showError(msg);
+    })
+    .catch(function (err) {
+      setSubmitLoading(false);
+      console.error('Registration backend error:', err);
+      showError('Network error. Please try again later or register via Discord.');
     });
   }
 
@@ -317,7 +392,7 @@
       }]
     };
 
-    fetch(DISCORD_WEBHOOK, {
+    fetch(EFFECTIVE_DISCORD_WEBHOOK, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify(embed),

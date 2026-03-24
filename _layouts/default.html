@@ -30,6 +30,13 @@
 
   {% include footer.html %}
 
+  <!-- Frontend config (injected from _config.yml) -->
+  <div id="bhs-config"
+       data-discord-webhook="{{ site.squadron.discord_webhook | escape }}"
+       data-registration-endpoint="{{ site.registration.endpoint | default: '' | escape }}"
+       data-registration-shared-secret="{{ site.registration.shared_secret | default: '' | escape }}"
+       hidden></div>
+
   <script src="{{ '/assets/js/main.js' | relative_url }}"></script>
   {% if page.extra_js %}
   {% for js in page.extra_js %}

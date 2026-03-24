@@ -29,6 +29,14 @@ squadron:
   discord_widget_id: "1298769240874029106"
   discord_webhook: "***REDACTED***"   # Paste your webhook URL here to enable registration notifications
 
+# Registration backend (recommended for slot enforcement + Sheets + Discord)
+registration:
+  # Cloudflare Worker URL (e.g. https://bhs-registration.<your-subdomain>.workers.dev/register)
+  endpoint: "https://bhs-registration.bluehorizonsquadron.workers.dev/register"
+  # Optional shared secret; if set, the site will send it as X-BHS-Auth.
+  # Leave blank until your Worker is configured.
+  shared_secret: "bhs_5Vh2w2c8G9f4Kq7Rn1s3Tz6Yp0Lm8Xu4Da9Ne2Jc7Qv"
+
 # Author
 author:
   name: "607 Virtual Fighter Wing | Blue Horizon Squadron"
