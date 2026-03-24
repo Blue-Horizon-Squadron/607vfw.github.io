@@ -161,7 +161,8 @@ export default {
 
     if (url.pathname === '/register' && request.method === 'POST') {
       try {
-        requireAuth(request, env);
+        // NOTE: /register is intentionally public so the static site can submit.
+        // Admin endpoints remain protected by X-BHS-Auth.
 
         const body = await readJson(request);
 
