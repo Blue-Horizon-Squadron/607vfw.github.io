@@ -11,6 +11,7 @@
  */
 
 import { jsonResponse, readJson } from './util.js';
+import { getRoleSlotsFromConfig } from './opsConfig.js';
 
 export class RegistrationStore {
   constructor(state, env) {
@@ -50,13 +51,24 @@ export class RegistrationStore {
     const roles = (await this.state.storage.get('roles')) || {};
     const regs = (await this.state.storage.get('regs')) || {};
 
-    // If we don't yet know the slots for this role, infer from payload (best effort).
-    // Preferred: client should send role_slots, but we can allow explicit slots mapping.
-    // NOTE: This Worker can only enforce caps it knows.
-    const roleSlots = Number(body.role_slots);
+    // Trusted role capacity (tamper-proof)
+    // Prefer a more specific role key when available to disambiguate duplicate role names.
+    const roleKey = String(body.role_aircraft || '').trim() || role;
+    let roleSlots = await getRoleSlotsFromConfig(this.env, body.operation_id, roleKey);
+    if (!Number.isFinite(roleSlots) && roleKey !== role) {
+      roleSlots = await getRoleSlotsFromConfig(this.env, body.operation_id, role);
+    }
+
+    // Backward compatible fallback (optional): allow client to provide role_slots
+    // Only enable this if you explicitly set ALLOW_CLIENT_ROLE_SLOTS=true in env.
+    if (!Number.isFinite(roleSlots)) {
+      const allowClient = String(this.env.ALLOW_CLIENT_ROLE_SLOTS || '').toLowerCase() === 'true';
+      if (allowClient) roleSlots = Number(body.role_slots);
+    }
+
     if (!roles[role]) {
       if (!Number.isFinite(roleSlots) || roleSlots <= 0) {
-        return jsonResponse({ ok: false, message: 'Role capacity unknown. Please refresh and try again.' }, 400, '*');
+        return jsonResponse({ ok: false, message: 'Role capacity unknown. This operation is not configured.' }, 400, '*');
       }
       roles[role] = { slots: roleSlots, filled: 0 };
     }

@@ -296,6 +296,12 @@
         discord:        document.getElementById('reg-discord').value.trim(),
         callsign:       document.getElementById('reg-callsign').value.trim(),
         role:           regRoleInput.value,
+        role_aircraft:  (function () {
+          if (!Array.isArray(currentRoles) || !currentRoles.length) return '';
+          const selected = currentRoles.find(function (r) { return r && r.name === regRoleInput.value; });
+          if (!selected) return '';
+          return String(selected.name || '') + '|' + String(selected.aircraft || '');
+        })(),
         role_slots:     (function () {
           if (!Array.isArray(currentRoles) || !currentRoles.length) return '';
           const selected = currentRoles.find(function (r) { return r && r.name === regRoleInput.value; });
