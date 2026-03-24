@@ -48,7 +48,7 @@
       aircraft: "Various"
       slots: 2
       filled: 0
-  patch_image: "https://github.com/user-attachments/assets/78e388bc-1729-4e2d-9e6e-0cbdda203928"
+  patch_image: "{{ '/assets/images/bhs-digital-patch.png' | relative_url }}"
   tags:
     - "Caucasus"
     - "Multi-Role"
@@ -96,7 +96,7 @@
       aircraft: "Various"
       slots: 1
       filled: 0
-  patch_image: "https://github.com/user-attachments/assets/0c2fcde1-4d2f-42de-a175-001202033111"
+  patch_image: "{{ '/assets/images/bhs-digital-patch.png' | relative_url }}"
   tags:
     - "Caucasus"
     - "CAS"
@@ -156,7 +156,7 @@
       aircraft: "Various"
       slots: 2
       filled: 0
-  patch_image: "https://github.com/user-attachments/assets/0a030e36-dc89-4cdf-a026-9d5ec07f4241"
+  patch_image: "{{ '/assets/images/bhs-digital-patch.png' | relative_url }}"
   tags:
     - "Persian Gulf"
     - "Carrier Ops"

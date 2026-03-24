@@ -39,4 +39,4 @@ Everything else happens on Discord — voice comms during ops, debriefs, trainin
 
 *Blue Horizon Squadron — Fly High. Fight Hard. Fly Together.*
 
-— **Phantom**, Squadron Commander
+— **Capra**, Squadron Commander
