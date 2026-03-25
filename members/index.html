@@ -45,7 +45,7 @@ description: "Meet the pilots of 607 VFW. Learn about our members, ranks, and ho
       <div class="member-card__role">{{ member.role }}</div>
       {% if member.squadron == '607vfw' %}
       <div class="member-card__607">{{ member.squadron }}</div>
-      {$ endif %}
+      {% endif %}
       {% if member.squadron == 'bhs' %}
       <div class="member-card__bhs">{{ member.squadron }}</div>
       {% endif %}
@@ -71,7 +71,7 @@ description: "Meet the pilots of 607 VFW. Learn about our members, ranks, and ho
         {% endfor %}
       </div> -->
       <!-- {% endif %} -->
-      <div style="margin-top: 8px; font-size:.75rem; color:#8b949e;">Since {{ member.joined | date: "%-d %B %Y "}}</div>
+      <div style="margin-top: 8px; font-size:.75rem; color:#8b949e;">Since {{ member.joined | date: "%-d %B %Y" }}</div>
     </div>
     {% endif %}
     {% endfor %}
