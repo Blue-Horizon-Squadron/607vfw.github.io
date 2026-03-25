@@ -1,151 +1,116 @@
 - callsign: "Capra"
-  name: "PC \"Capra\" Hater"
+  initials: "PC"
   role: "Founder"
   rank: "Marshall"
-  aircraft:
-    - "All Fixed Wing"
-    - "All Rotary Wing"
-  specialties:
-    # - "BFM"
-    # - "Strike"
-    - "Mission Planning"
-    - "Mission Design"
-    - "BFM"
-    - "BVR"
-    - "Strike"
-    - "Escort"
-    - "Intercept"
-    - "GCI/AWACS"
-  terrains:
-    - "All Terrains"
-  joined: "2024"
+  squadron:
+    - "607"
+  joined: "2024-10-23"
   status: "active"
-  initials: "PC"
 
 - callsign: "KC"
-  name: "K.C \"KC\" Hater"
+  initials: "KC"
   role: "Co-Founder / Capra's Wife"
   rank: "Vice Marshall"
-  aircraft:
-    - "All Fixed Wing"
-    - "All Rotary Wing"
-  specialties:
-    - "[CLASSIFIED]"
-  terrains:
-    - "All Terrains"
-  joined: "2024"
+  squadron:
+    - "607"
+  joined: "2024-12-15"
   status: "active"
-  initials: "KC"
 
 - callsign: "Lynx"
-  name: "[CLASSIFIED]"
   role: "Manager"
   rank: "Air Commodore"
-  aircraft:
-    - "F-16C Viper"
-    - "C130J Hercules"
-  specialties:
-    - "BVR Combat"
-    - "SEAD"
-  terrains:
-    - "Unknown"
-  joined: "2025"
+  squadron:
+    - "607"
+  joined: "2025-04-19"
   status: "active"
   initials: "VX"
 
-- callsign: "Kelso"
-  name: "Kelso"
-  role: "Manager"
-  rank: "Vice Air Commodore"
-  aircraft:
-    - "F-16C Viper"
-    # - "MiG-29"
-  specialties:
-    - "BFM"
-    - "BVR"
-  terrains:
-    - "Unknown"
-  joined: "2025"
-  status: "active"
-  initials: "KS"
-
 - callsign: "Vaux"
-  name: "Kyle \"Daddy\" Vaux"
   role: "Server Admin"
   rank: "N/A"
-  aircraft:
-    - "F-14A Tomcat"
-    - "F-14B Tomcat"
-  specialties:
-    - "CAS"
-    - "Ground Attack"
-    - "Low Level"
-  terrains:
-    - "Caucasus"
-    - "Syria"
-    - "Afghanistan"
-  joined: "2025"
+  squadron:
+    - "607"
+  joined: "2025-04-22"
   status: "active"
   initials: "DV"
 
-- callsign: "Ericat"
-  name: "[CLASSIFIED]"
-  role: "Server Admin"
-  rank: "N/A"
-  aircraft:
-    - "UNKNOWN"
-  specialties:
-    - "CAS"
-    - "Ground Attack"
-    - "Low Level"
-  joined: "2025"
-  status: "active"
-  initials: "EC"
-
-- callsign: "Analog"
-  name: "[CLASSIFIED]"
+- callsign: "Deck"
+  initials: "MD"
   role: "Moderator"
   rank: "N/A"
-  aircraft:
-    - "F14A/B Tomcat"
-    - "F-16C Viper"
-    - "F/A-18C Hornet"
-    - "A-10C-II"
-    - "F-86"
-    - "F-15C"
-    - "MiG-29"
-    - "P-47"
-    - "AH-64D"
-    - "UH-1H"
-  specialties:
-    - "Being Analog"
-    - "F14A/B Specialist"
-    - "Ground Attack"
-    - "CAS"
-  terrains:
-    - "Caucasus"
-    - "Persian Gulf"
-    - "Syria"
-    - "Normandy 2.0"
-    - "Marianas"
-    - "Marianas WWII"
-  joined: "2025"
+  squadron:
+    - "607"
+  joined: "2025-05-03"
   status: "active"
-  initials: "AN"
 
-- callsign: "Magic"
-  name: "[CLASSIFIED]"
+- callsign: "Panda"
+  initials: "KP"
   role: "Pilot"
   rank: "N/A"
-  aircraft:
-    - "F-16C Viper"
-    - "OH-58D Kiowa"
-  specialties:
-    - "BFM"
-    - "BVR"
-    - "Ground Attack"
-  terrains:
-    - "Unknown"
-  joined: "2025"
+  squadron:
+    - "607"
+  joined: "2025-06-11"
   status: "active"
-  initials: "AN"
+
+- callsign: "Ericat"
+  initials: "EC"
+  role: "Server Admin"
+  rank: "N/A"
+  squadron:
+    - "607"
+  joined: "2025-07-06"
+  status: "active"
+
+- callsign: "Doofen"
+  initials: "DC"
+  role: "Server Admin"
+  rank: "N/A"
+  squadron:
+    - "607"
+  joined: "2025-07-18"
+  status: "active"
+
+- callsign: "Arty"
+  initials: "AT"
+  role: "Pilot"
+  rank: "N/A"
+  squadron:
+    - "607"
+  joined: "2025-07-27"
+  status: "active"
+
+- callsign: "Nardo"
+  initials: "ND"
+  role: "Pilot"
+  rank: "N/A"
+  squadron:
+    - "607"
+  joined: "2025-08-07"
+  status: "active"
+
+- callsign: "Bear"
+  initials: "GR"
+  role: "Pilot"
+  rank: "N/A"
+  squadron:
+    - "607"
+  joined: "2025-08-30"
+  status: "active"
+
+- callsign: "Monkie"
+  initials: "AM"
+  role: "Pilot"
+  rank: "N/A"
+  squadron:
+    - "607"
+  joined: "2025-10-22"
+  status: "active"
+
+- callsign: "Slyvi"
+  initials: "SS"
+  role: "Pilot"
+  rank: "N/A"
+  squadron:
+    - "607"
+  joined: "2026-01-10"
+  status: "active"
