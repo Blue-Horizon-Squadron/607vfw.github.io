@@ -26,7 +26,7 @@
   initials: "VX"
 
 - callsign: "Vaux"
-  role: "Server Admin"
+  role: "Mission Designer"
   rank: "N/A"
   squadron:
     - "607"
@@ -54,7 +54,7 @@
 
 - callsign: "Ericat"
   initials: "EC"
-  role: "Server Admin"
+  role: "Mission Designer"
   rank: "N/A"
   squadron:
     - "607"
@@ -63,7 +63,7 @@
 
 - callsign: "Doofen"
   initials: "DC"
-  role: "Server Admin"
+  role: "Community Admin"
   rank: "N/A"
   squadron:
     - "607"
