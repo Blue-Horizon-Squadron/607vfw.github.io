@@ -3,7 +3,10 @@
   role: "Founder"
   rank: "Marshall"
   squadron:
-    - "607vfw"
+    class: "607"
+    tag: "607 | "
+    name: "607 Virtual Fighter Wing"
+    patch: "/assets/images/607vfw_patch.png"
   joined: "2024-10-23"
   status: "active"
 
@@ -12,7 +15,10 @@
   role: "Co-Founder"
   rank: "Vice Marshall"
   squadron:
-    - "607vfw"
+    class: "607"
+    tag: "607 | "
+    name: "607 Virtual Fighter Wing"
+    patch: "/assets/images/607vfw_patch.png"
   joined: "2024-12-15"
   status: "active"
 
@@ -21,7 +27,10 @@
   role: "Manager"
   rank: "Air Commodore"
   squadron:
-    - "607vfw"
+    class: "607"
+    tag: "607 | "
+    name: "607 Virtual Fighter Wing"
+    patch: "/assets/images/607vfw_patch.png"
   joined: "2025-04-19"
   status: "active"
 
@@ -30,7 +39,10 @@
   role: "Mission Designer"
   rank: "N/A"
   squadron:
-    - "607vfw"
+    class: "607"
+    tag: "607 | "
+    name: "607 Virtual Fighter Wing"
+    patch: "/assets/images/607vfw_patch.png"
   joined: "2025-04-22"
   status: "active"
 
@@ -39,7 +51,10 @@
   role: "Moderator"
   rank: "N/A"
   squadron:
-    - "607vfw"
+    class: "607"
+    tag: "607 | "
+    name: "607 Virtual Fighter Wing"
+    patch: "/assets/images/607vfw_patch.png"
   joined: "2025-05-03"
   status: "active"
 
@@ -48,7 +63,10 @@
   role: "Pilot"
   rank: "N/A"
   squadron:
-    - "607vfw"
+    class: "607"
+    tag: "607 | "
+    name: "607 Virtual Fighter Wing"
+    patch: "/assets/images/607vfw_patch.png"
   joined: "2025-06-11"
   status: "active"
 
@@ -57,7 +75,10 @@
   role: "Mission Designer"
   rank: "N/A"
   squadron:
-    - "607vfw"
+    class: "607"
+    tag: "607 | "
+    name: "607 Virtual Fighter Wing"
+    patch: "/assets/images/607vfw_patch.png"
   joined: "2025-07-06"
   status: "active"
 
@@ -66,7 +87,10 @@
   role: "Community Admin"
   rank: "N/A"
   squadron:
-    - "607vfw"
+    class: "607"
+    tag: "607 | "
+    name: "607 Virtual Fighter Wing"
+    patch: "/assets/images/607vfw_patch.png"
   joined: "2025-07-18"
   status: "active"
 
@@ -75,7 +99,10 @@
   role: "Pilot"
   rank: "N/A"
   squadron:
-    - "607vfw"
+    class: "607"
+    tag: "607 | "
+    name: "607 Virtual Fighter Wing"
+    patch: "/assets/images/607vfw_patch.png"
   joined: "2025-07-27"
   status: "active"
 
@@ -84,7 +111,10 @@
   role: "Pilot"
   rank: "N/A"
   squadron:
-    - "607vfw"
+    class: "607"
+    tag: "607 | "
+    name: "607 Virtual Fighter Wing"
+    patch: "/assets/images/607vfw_patch.png"
   joined: "2025-08-07"
   status: "active"
 
@@ -93,7 +123,10 @@
   role: "Pilot"
   rank: "N/A"
   squadron:
-    - "607vfw"
+    class: "607"
+    tag: "607 | "
+    name: "607 Virtual Fighter Wing"
+    patch: "/assets/images/607vfw_patch.png"
   joined: "2025-08-30"
   status: "active"
 
@@ -102,7 +135,10 @@
   role: "Pilot"
   rank: "N/A"
   squadron:
-    - "607vfw"
+    class: "607"
+    tag: "607 | "
+    name: "607 Virtual Fighter Wing"
+    patch: "/assets/images/607vfw_patch.png"
   joined: "2025-10-22"
   status: "active"
 
@@ -111,7 +147,10 @@
   role: "Pilot"
   rank: "N/A"
   squadron:
-    - "607vfw"
+    class: "607"
+    tag: "607 | "
+    name: "607 Virtual Fighter Wing"
+    patch: "/assets/images/607vfw_patch.png"
   joined: "2026-01-10"
   status: "active"
 
@@ -120,6 +159,9 @@
   role: "Pilot"
   rank: "N/A"
   squadron:
-    - "bhs"
+    class: "bhs"
+    tag: "BHS | "
+    name: "Blue Horizon Squadron"
+    patch: "/assets/images/bhs-digital-patch.png"
   joined: "2026-01-10"
   status: "active"
