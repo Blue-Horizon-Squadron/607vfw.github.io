@@ -40,7 +40,7 @@ description: "Meet the pilots of 607 VFW. Learn about our members, ranks, and ho
     {% for member in site.data.members %}
     {% if member.status == 'active' %}
     <div class="member-card">
-      <div class="member-card__avatar"><img href="{{ member.squadron.patch }}" /></div>
+      <div class="member-card__avatar"><img src="{{ member.squadron.patch | relative_url }}" /></div>
       <div class="member-card__name">"{{ member.squadron.tag }}{{ member.callsign }}"</div>
       <div class="member-card__role">{{ member.role }}</div>
       <div class="member-card__{{ member.squadron.class }}">{{ member.squadron.name }}</div>
